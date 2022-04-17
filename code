@@ -1,5 +1,6 @@
-import time
-
+# here u can get the ready queue !! 
+from posixpath import split
+ # must be the last instrction in the whole script 
 #PR functions
 def turn_round():
     j=3
@@ -36,15 +37,12 @@ def cpu_timline_pr():
     print("the CPU timeline : \n")
     print(notready_queu)    
 
-        
 
-            
-
-# here u can get the ready queue !! 
 def ready_queue():
+    file=open(file_name,"r")
     data=file.read()
     ready_queue=data.split('\n')
-    return ready_queue
+    return(ready_queue)
 def total_burst(y):    
     x=y.split()
     total=0
@@ -54,8 +52,7 @@ def total_burst(y):
         for i in range(int(x[2])):
             total = total + int(x[i+3])
     return total  
-    from posixpath import split
-def  timeline(burset_time):
+def  timeline_RR(burset_time):
     queu=ready_queue()
     #array of total bursts
     burts=[]
@@ -75,8 +72,18 @@ def  timeline(burset_time):
         else :
             n=n+1
         if (n+1) == v :
-            n=0        
-# main \\\   
+            n=0   
+def waiting_list():
+    queu=ready_queue()
+    burst=[]
+    for i in range(len(queu)):
+        burst.append(total_burst(queu[i]))
+    for i in range(len(burst)):
+        burst[i]=burst[i]
+    for i in range(len(burst)):
+        print(f"the waiting time for {queu[i]} is : {burst[i]}")
+
+# main \\\ 
 file_name=input("input File Name  ")
 algo_type=input("CPU Scheduling Alg ")
 file=open(file_name,"r")
@@ -84,10 +91,7 @@ if algo_type=='RR':
     burst_time=input("quantum : ")
     print(f"The Average turn around time is : {turn_round()} ms \n")
     print("The CPU timeline is : \n")
-    timeline(burst_time)
-
-
-
+    timeline_RR(burst_time)
 if algo_type=='PR':
     print(f"The Average turn around time is : {turn_round()} ms \n")
     cpu_timline_pr()
