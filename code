@@ -97,7 +97,7 @@ def total_burst(y):
             total = total + int(x[2])
     return total
 
-#PR functions
+#RR functions
 
 def response_timeRR(fturn,arrival):
     queu=ready_queue()
@@ -160,6 +160,7 @@ def  timeline_RR(burset_time):
     queu=ready_queue()
     proc_queu=[]
     all_burts=[]
+    idel=[]
     for i in range(len(queu)):
         if queu[i][0:4] == 'proc':
             proc_queu.append(queu[i])
@@ -180,6 +181,11 @@ def  timeline_RR(burset_time):
              all_burts.append(total_burst(queu[i]))  
              n_proc.append('/') 
     burts=all_burts
+    for i in range(len(queu)):
+        if queu[i][0:4]=='idle':
+            idel.append(burts[i])
+        else:
+            idel.append(0)
     v=len(burts)
     n=0
     total=0
@@ -200,6 +206,18 @@ def  timeline_RR(burset_time):
         time_com.append(-1)
     ###############################################
     time_lunch=1
+    ###########CPU utilization:#########################
+    cpu_u=0
+    total_bur_cpu=0
+    total_idle_cpu=0
+    for i in range(len(burts)):
+        if queu[i][0:4]=='proc':
+            zx=queu[i][0:4]
+            total_bur_cpu=total_bur_cpu+burts[i]
+        elif queu[i][0:4]=='idle':
+            total_idle_cpu=total_idle_cpu+burts[i]
+    cpu_u=total_bur_cpu/(total_bur_cpu+total_idle_cpu)
+    ###################################################
     while(n<len(all_burts)):
         if (len(burts)-1) == (burts.count(0)) and flag2==1 and burts[index_burset]!=0 :
             total=time_lunch
@@ -217,9 +235,14 @@ def  timeline_RR(burset_time):
             next_index=n
             n=index_burset
             flag3=0
+        if queu[n][0:4]=='idle' and time_lunch > total:
+            if (n+1)==(len(burts)-1):
+                n=0
+            else:
+                n=n+2
         if burts.count(0) == len(burts) :
-            return time_com,fturn
-            break 
+            print("\n")
+            return time_com,fturn,cpu_u 
         if burts[n] > 0 :
             if (burts[n]-int(burset_time))<0:
                 last_stop=total+burts[n]
@@ -256,8 +279,6 @@ def waiting_list():
         burst[i]=burst[i]
     for i in range(len(burst)):
         print(f"the waiting time for {queu[i]} is : {burst[i]}")
-
-
 # main \\\ 
 file_name=input("input File Name  ")
 algo_type=input("CPU Scheduling Alg ")
@@ -265,10 +286,11 @@ file=open(file_name,"r")
 if algo_type=='RR':
     burst_time=input("quantum : ")
     print("The CPU timeline is : \n")
-    time_com,fturn=timeline_RR(burst_time)
+    time_com,fturn,cpu_u=timeline_RR(burst_time)
     ava_turnround,arrival=turnaround_timeRR(time_com)
     print(f"The Average turn around time is : {ava_turnround} ms \n")
-    print(f"The Average turn around time is : {response_timeRR(fturn,arrival)} ms \n")
+    print(f"The Average response time is : {response_timeRR(fturn,arrival)} ms \n")
+    print(f"The CPU utilization : {cpu_u}\n")
 if algo_type=='PR':
     print(f"The Average turn around time is : {turn_round()} ms \n")
     print(f"The Average response time is : {response()} ms \n")
