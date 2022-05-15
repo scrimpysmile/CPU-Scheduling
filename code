@@ -68,17 +68,17 @@ def cpu_timline_pr():
     for i in range(len(notready_queu)):
         idle = 0
         for j in range(len(notready_queu)):
-            x=notready_queu[j].split()
+            x=proc[j]
             if x[0]=='proc' or x[0] =='idle':
                 if int(x[1]) == i or x[0] =='idle':
                     if x[0]=='proc':
                         sum = sum + (int (x[2]))
                         ta.append(sum)
-                        char.append(proc)
+                        char.append(x[3])
                     elif x[0]=='idle':
                         idle = idle + int(x[1])
-    #for i in range(len(ta)-1):
-    print(ta)
+    for i in range(len(ta)-1):
+        print("PROC %c (%d -> %d)" %(char[i],ta[i],ta[i+1]))
         
 
 def ready_queue():
@@ -262,9 +262,6 @@ def waiting_list():
 file_name=input("input File Name  ")
 algo_type=input("CPU Scheduling Alg ")
 file=open(file_name,"r")
-h='A'
-x = chr(ord(h) + 3)
-print(x)
 if algo_type=='RR':
     burst_time=input("quantum : ")
     print("The CPU timeline is : \n")
