@@ -1,3 +1,3 @@
 # CPU-Scheduling
-![Screenshot 2022-04-17 234855](https://user-images.githubusercontent.com/103215394/163731644-d4a0ab79-bae9-4a08-8726-baec2b2cbf92.jpg)
-![WhatsApp Image 2022-04-17 at 11 52 30 PM](https://user-images.githubusercontent.com/103215394/163731684-08fb87bb-6da7-41cb-a32f-60d2b5b5aaaf.jpeg)
+![image](https://user-images.githubusercontent.com/103215394/168490310-53edef7e-3701-4c0f-a05c-207c1d0b9a0a.png)
+![image](https://user-images.githubusercontent.com/103215394/168490318-c1ea85e3-57ee-410f-aaf2-b03b77d0e83b.png)
