@@ -1,42 +1,85 @@
 # here u can get the ready queue !! 
+from itertools import count
 from posixpath import split
+import string
+from time import time 
  # must be the last instrction in the whole script 
 #PR functions
 def turn_round():
-    j=3
     sum=0
+    idle=0
+    ta=[]
+    temp=0
     notready_queu=ready_queue()
     for i in range(len(notready_queu)):
-        x=notready_queu[i].split()
-        if x[0]=='proc':
-            for i in range(len(x)-3):
-                sum = sum + int (x[j])
-        elif x[0]=='idle':
-            sum = sum + int(x[1])
-        else:
-            break
-    return (sum/5)            
-            
-def cpu_timline_pr():
-    x=[]
-    j=1
-    timel=[]
- 
-    notready_queu=ready_queue()
-    for i in range(len(notready_queu)):
-        x=notready_queu[i].split()
-    for i in range(len(x)):
-        for z in range(len(x)):    
-            com=0
-            if(x[i][0]=='proc') and (x[z][0]=='proc'):
-                if(int(x[i][j]>x[z][j])):
-                    com=com+1
-                elif(int(len(x[i]))>int(len(x[z]))):
-                    com=com+1
-                timel.append(com)
-    print("the CPU timeline : \n")
-    print(notready_queu)    
+        idle = 0
+        for j in range(len(notready_queu)):
+            x=notready_queu[j].split()
+            if x[0]=='proc' or x[0] =='idle':
+                if int(x[1]) == i or x[0] =='idle':
+                    if x[0]=='proc':
+                        sum = sum + (int (x[2])-idle)
+                        ta.append(sum)
+                        sum = sum + idle
+                    elif x[0]=='idle':
+                        idle = idle + int(x[1])
+    for i in range(len(ta)):
+        temp = temp + ta[i]
+    return (temp/4)            
 
+def response():
+    sum=0
+    idle=0
+    ta=[]
+    temp=0
+    notready_queu=ready_queue()
+    for i in range(len(notready_queu)):
+        idle = 0
+        for j in range(len(notready_queu)):   
+            x=notready_queu[j].split()
+            if x[0]=='proc' or x[0] =='idle':
+                if int(x[1]) == i or x[0] =='idle':
+                    if x[0]=='proc':
+                        ta.append(sum)
+                        sum = sum + (int (x[2])-idle)
+                    elif x[0]=='idle':
+                        idle = idle + int(x[1])
+    for i in range(len(ta)):
+        temp = temp + ta[i]
+    return (temp/4)
+
+def cpu_timline_pr():
+    sum=0
+    idle=0
+    ta=[]
+    temp='A'
+    c = 0
+    ta.append(0)
+    proc=[]
+    char=[]
+    notready_queu=ready_queue()
+    for i in range(len(notready_queu)):
+        y=notready_queu[i].split()
+        if y[0]=='proc':
+            y.append(chr(ord(temp) + c))
+            c=c+1
+        proc.append(y)
+    
+    for i in range(len(notready_queu)):
+        idle = 0
+        for j in range(len(notready_queu)):
+            x=notready_queu[j].split()
+            if x[0]=='proc' or x[0] =='idle':
+                if int(x[1]) == i or x[0] =='idle':
+                    if x[0]=='proc':
+                        sum = sum + (int (x[2]))
+                        ta.append(sum)
+                        char.append(proc)
+                    elif x[0]=='idle':
+                        idle = idle + int(x[1])
+    #for i in range(len(ta)-1):
+    print(ta)
+        
 
 def ready_queue():
     file=open(file_name,"r")
@@ -46,33 +89,164 @@ def ready_queue():
 def total_burst(y):    
     x=y.split()
     total=0
-    if y == '' or y=='Done' or x[0]=='idle':
+    if y == '' or y=='Done':
         return 0
+    if x[0]=='idle':
+        return int(x[1])
     if x[0] != 'idle' or x[0] != 'Done' or x[0] != '' :
-        for i in range(int(x[2])):
-            total = total + int(x[i+3])
-    return total  
+            total = total + int(x[2])
+    return total
+
+#PR functions
+
+def response_timeRR(fturn,arrival):
+    queu=ready_queue()
+    time_res=[]
+    ###setting up a T-response list ########
+    for i in range(len(fturn)): 
+        time_res.append(0)
+    ########################################
+    n=0
+    while n != len(fturn):
+        if queu[n][0:4] == 'idle':
+            time_res[n]=fturn[(n+1)]-arrival[n]
+            n=n+2
+        else:
+            time_res[n]=fturn[n]-arrival[n]
+            n=n+1
+    ava=sum(time_res)/(len(arrival)-1)
+    return ava
+def turnaround_timeRR(time_com):
+    queu=ready_queue()
+    time_arr=[]
+    burts=[]
+    all_burts=[]
+    counter=0
+    ######################################################
+    for i in range(len(queu)):
+        if queu[i][0:4] == 'proc':
+            burts.append(total_burst(queu[i]))
+            all_burts.append(total_burst(queu[i]))
+        elif queu[i] != 'Done' :
+             all_burts.append(total_burst(queu[i])) 
+    ##################################################### 
+
+     #setting up time arrival list for turnaround time :
+    for i in range(len(all_burts)): 
+        time_arr.append(0)
+    #### size of turnround without idle #######
+    for i in range(len(queu)):
+         if queu[i][0:4] == 'idle' or queu[i][0:4] == 'Done' :
+             counter=counter+1
+    time_round=[]
+    for i in range(len(queu)-1):
+        time_round.append(0)         
+    #####################################          
+    for i in range(len(queu)):
+        if queu[i][0:4]=='idle':
+            time_arr[i]=all_burts[i]
+    #####################################
+    i=0
+    while i != len(time_com):
+        if time_com[i]==-1:
+            time_round[i+1]=time_com[(i+1)]-time_arr[i]
+            i=i+2
+        else :
+            time_round[i]=time_com[i]
+            i=i+1
+    ava=(sum(time_round)/len(burts))
+    return ava,time_arr
 def  timeline_RR(burset_time):
     queu=ready_queue()
+    proc_queu=[]
+    all_burts=[]
+    for i in range(len(queu)):
+        if queu[i][0:4] == 'proc':
+            proc_queu.append(queu[i])
     #array of total bursts
     burts=[]
+    #array for each proc name 
+    alp=list(string.ascii_uppercase)    
+    n_proc=[]
+    x=queu[0][0:4]
+    z=0
     for i in range(len(queu)):
-        burts.append(total_burst(queu[i]))
+        if queu[i][0:4] == 'proc':
+            burts.append(total_burst(queu[i]))
+            all_burts.append(total_burst(queu[i]))
+            n_proc.append(alp[z])
+            z=z+1
+        elif queu[i] != 'Done' :
+             all_burts.append(total_burst(queu[i]))  
+             n_proc.append('/') 
+    burts=all_burts
     v=len(burts)
     n=0
-    while(n<len(burts)):
+    total=0
+    last_stop=0
+    time_com=[]
+    fturn=[]
+    flag1=1
+    flag2=1
+    flag3=1
+    flag4=1
+    next_index=0
+    index_burset=-2
+    #setting up list for fisrt turn time :
+    for i in range(len(burts)): 
+        fturn.append(-1)
+    #setting up time com list for turnaround time :
+    for i in range(len(burts)): 
+        time_com.append(-1)
+    ###############################################
+    time_lunch=1
+    while(n<len(all_burts)):
+        if (len(burts)-1) == (burts.count(0)) and flag2==1 and burts[index_burset]!=0 :
+            total=time_lunch
+            flag2=0
+        if queu[n][0:4] == 'idle' and flag1==1:
+            index_burset=n+1
+            time_lunch=all_burts[n]
+            all_burts[n]=0
+            flag1=0
+            if (n+1)==(len(burts)-1):
+                n=0
+            else:
+                n=n+2
+        if time_lunch<=total and flag1==0 and burts[index_burset]!=0 and flag3==1:
+            next_index=n
+            n=index_burset
+            flag3=0
         if burts.count(0) == len(burts) :
+            return time_com,fturn
             break 
         if burts[n] > 0 :
+            if (burts[n]-int(burset_time))<0:
+                last_stop=total+burts[n]
+            else:
+                last_stop=total+int(burset_time)
             burts[n]=burts[n]-int(burset_time)
-            if burts[n] < 0:
+            if burts[n] <= 0:
+                if fturn[n] == -1 :
+                    fturn[n]=total
+                time_com[n]=last_stop
+                take=int(burset_time)+burts[n]
+                print(f"->proc {n_proc[n]}:{n_proc[n]}({total}->{last_stop})  ,{queu[n]}")
                 burts[n]=0
-            print(f"-> {queu[n]}")
+            else:
+                if fturn[n] == -1 :
+                    fturn[n]=total
+                take=int(burset_time)
+                print(f"->proc {n_proc[n]}:{n_proc[n]}({total}->{last_stop}) ,{queu[n]}")   
             n=n+1
+            total=total+take
         else :
             n=n+1
-        if (n+1) == v :
+        if n == v :
             n=0   
+        if n==(index_burset+1) and flag4==1 :
+            n=next_index
+            flag4=0
 def waiting_list():
     queu=ready_queue()
     burst=[]
@@ -83,16 +257,26 @@ def waiting_list():
     for i in range(len(burst)):
         print(f"the waiting time for {queu[i]} is : {burst[i]}")
 
+
 # main \\\ 
 file_name=input("input File Name  ")
 algo_type=input("CPU Scheduling Alg ")
 file=open(file_name,"r")
+h='A'
+x = chr(ord(h) + 3)
+print(x)
 if algo_type=='RR':
     burst_time=input("quantum : ")
-    print(f"The Average turn around time is : {turn_round()} ms \n")
     print("The CPU timeline is : \n")
-    timeline_RR(burst_time)
+    time_com,fturn=timeline_RR(burst_time)
+    ava_turnround,arrival=turnaround_timeRR(time_com)
+    print(f"The Average turn around time is : {ava_turnround} ms \n")
+    print(f"The Average turn around time is : {response_timeRR(fturn,arrival)} ms \n")
 if algo_type=='PR':
     print(f"The Average turn around time is : {turn_round()} ms \n")
+    print(f"The Average response time is : {response()} ms \n")
+    print("The CPU Timeline: ")
     cpu_timline_pr()
 file.close() # must be the last instrction in the whole script
+ 
+ 
